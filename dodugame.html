@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodu's Sweets</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cocktail+Script&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background: #ff69b4; /* Single solid pink color */
+            position: relative;
+            font-family: 'Cocktail Script', cursive;
+            cursor: none;
+        }
+
+        /* Rainbow background - more subtle */
+        .rainbow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 100% 20%, transparent 20%, rgba(255,100,150,0.1) 40%),
+                radial-gradient(circle at 90% 40%, transparent 25%, rgba(255,150,200,0.1) 45%);
+            filter: blur(12px);
+            z-index: 1;
+        }
+
+        /* White Title */
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(3rem, 8vw, 8rem);
+            color: #ffffff;
+            text-shadow: 
+                0 0 25px rgba(255,255,255,0.9),
+                0 0 45px rgba(255,255,255,0.7),
+                0 0 65px rgba(255,255,255,0.5);
+            z-index: 2;
+            filter: blur(3px);
+            pointer-events: none;
+        }
+
+        /* Counters */
+        .counters {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+            font-weight: bold;
+        }
+
+        .counter {
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .collected { color: #ff1493; }
+        .lost { color: #ffffff; }
+
+        /* Bigger Basket 🧺 */
+        .bucket {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 120px;
+            font-size: 6.5rem;
+            line-height: 1;
+            z-index: 5;
+            transition: left 0.1s ease;
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
+            text-shadow: none;
+        }
+
+        /* Sweets 🍬 */
+        .sweet {
+            position: absolute;
+            font-size: 4.2rem;
+            color: #ffffff;
+            z-index: 4;
+            animation: fall linear infinite;
+            text-shadow: 
+                0 0 20px rgba(255,255,255,0.9),
+                0 0 35px rgba(255,255,255,0.7),
+                0 0 50px rgba(255,215,0,0.5);
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.6));
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Game Over */
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4.5rem;
+            color: #ff4444;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+            z-index: 20;
+            display: none;
+            text-align: center;
+            animation: pulse 1s infinite;
+        }
+
+        /* Victory with buttons */
+        .victory {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 20;
+            display: none;
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .victory h1 {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 15px #ff6b6b); }
+            to { filter: drop-shadow(0 0 35px #ffd93d); }
+        }
+
+        .victory-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            font-family: 'Cocktail Script', cursive;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-play {
+            background: linear-gradient(45deg, #ff6b6b, #ff9ff3);
+            color: white;
+        }
+
+        .btn-sleep {
+            background: linear-gradient(45deg, #ffd93d, #ff9ff3);
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        /* Fireworks */
+        .firework {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-size: 1.3rem;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+    <div class="rainbow"></div>
+    <div class="title">dodu's sweets</div>
+    
+    <div class="counters">
+        <div class="counter lost">lost 🍭 <span id="lostCount">0</span></div>
+        <div class="counter collected">sweets: <span id="sweetCount">0</span></div>
+    </div>
+    
+    <div class="bucket" id="bucket">🧺</div>
+    <div class="instructions">Move mouse to control the basket!</div>
+    
+    <div class="game-over" id="gameOver">GAME OVER<br><div style="font-size:2rem;margin-top:20px;">Restarting in 3 seconds...</div></div>
+    
+    <div class="victory" id="victory">
+        <h1>good job dodu🤩🎉</h1>
+        <div class="victory-buttons">
+            <button class="btn btn-play" onclick="game.playAgain()">🍭 Play Again</button>
+            <button class="btn btn-sleep" onclick="game.eatAndSleep()">😴 Eat the sweets and sleep</button>
+        </div>
+    </div>
+
+    <script>
+        class SweetGame {
+            constructor() {
+                this.sweetCount = 0;
+                this.lostCount = 0;
+                this.missedSweets = 0;
+                this.sweetsPerDrop = 1;
+                this.dropInterval = 2500;
+                this.gameRunning = true;
+                this.bucket = document.getElementById('bucket');
+                this.sweetCountEl = document.getElementById('sweetCount');
+                this.lostCountEl = document.getElementById('lostCount');
+                this.gameOverEl = document.getElementById('gameOver');
+                this.victoryEl = document.getElementById('victory');
+                this.fallingSweets = [];
+                this.fireworks = [];
+
+                // Make game instance global for button access
+                window.game = this;
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.gameLoop();
+                this.dropSweets();
+            }
+
+            setupEventListeners() {
+                document.addEventListener('mousemove', (e) => {
+                    if (this.gameRunning) {
+                        const rect = document.body.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const bucketWidth = 160;
+                        const clampedX = Math.max(bucketWidth/2, Math.min(window.innerWidth - bucketWidth/2, x));
+                        this.bucket.style.left = clampedX + 'px';
+                    }
+                });
+            }
+
+            gameLoop() {
+                this.updateSweets();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+
+            dropSweets() {
+                if (!this.gameRunning) return;
+
+                for (let i = 0; i < this.sweetsPerDrop; i++) {
+                    setTimeout(() => this.createSweet(), i * 300);
+                }
+
+                setTimeout(() => this.dropSweets(), this.dropInterval);
+            }
+
+            createSweet() {
+                const sweet = document.createElement('div');
+                sweet.className = 'sweet';
+                sweet.innerHTML = '🍬';
+                sweet.style.left = Math.random() * (window.innerWidth - 80) + 'px';
+                sweet.style.animationDuration = (Math.random() * 4 + 5) + 's';
+                
+                document.body.appendChild(sweet);
+                this.fallingSweets.push({ element: sweet, x: parseFloat(sweet.style.left) });
+
+                setTimeout(() => {
+                    if (sweet.parentNode) {
+                        sweet.parentNode.removeChild(sweet);
+                        const index = this.fallingSweets.findIndex(s => s.element === sweet);
+                        if (index > -1) this.fallingSweets.splice(index, 1);
+                    }
+                }, 9000);
+            }
+
+            updateSweets() {
+                const bucketRect = this.bucket.getBoundingClientRect();
+                const bucketBottom = bucketRect.bottom;
+                const bucketTop = bucketRect.top;
+                const bucketLeft = bucketRect.left - 10;
+                const bucketRight = bucketRect.right + 10;
+
+                for (let i = this.fallingSweets.length - 1; i >= 0; i--) {
+                    const sweet = this.fallingSweets[i];
+                    const rect = sweet.element.getBoundingClientRect();
+                    
+                    if (rect.bottom >= bucketTop && rect.bottom <= bucketBottom &&
+                        rect.left >= bucketLeft && rect.right <= bucketRight) {
+                        sweet.element.remove();
+                        this.fallingSweets.splice(i, 1);
+                        this.collectSweet();
+                    } else if (rect.bottom > window.innerHeight) {
+                        sweet.element.remove();
+                        this.fallingSweets.splice(i, 1);
+                        this.missSweet();
+                    }
+                }
+            }
+
+            collectSweet() {
+                this.sweetCount++;
+                this.sweetCountEl.textContent = this.sweetCount;
+                this.updateDifficulty();
+            }
+
+            missSweet() {
+                this.lostCount++;
+                this.lostCountEl.textContent = this.lostCount;
+                this.missedSweets++;
+                
+                if (this.missedSweets >= 5 && this.gameRunning) { // Changed to 5
+                    this.gameOver();
+                }
+            }
+
+            updateDifficulty() {
+                if (this.sweetCount % 5 === 0) {
+                    this.sweetsPerDrop++;
+                    this.dropInterval = Math.max(600, this.dropInterval - 80);
+                }
+
+                if (this.sweetCount >= 20) { // Changed to 20
+                    this.victory();
+                }
+            }
+
+            gameOver() {
+                this.gameRunning = false;
+                this.gameOverEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    this.fullReset(); // Full reset from beginning
+                }, 3000);
+            }
+
+            victory() {
+                this.gameRunning = false;
+                this.createFireworks();
+                this.victoryEl.style.display = 'block';
+            }
+
+            playAgain() {
+                this.fullReset();
+            }
+
+            eatAndSleep() {
+                // Sweet ending - fade out
+                document.body.style.transition = 'opacity 2s ease';
+                document.body.style.opacity = '0';
+                setTimeout(() => {
+                    alert('🍭😴 Sweet dreams, Dodu! Thanks for playing! 💕');
+                    this.fullReset();
+                }, 2000);
+            }
+
+            fullReset() {
+                // COMPLETE RESET - back to very beginning
+                this.sweetCount = 0;
+                this.lostCount = 0;
+                this.missedSweets = 0;
+                this.sweetsPerDrop = 1;
+                this.dropInterval = 2500;
+                
+                this.sweetCountEl.textContent = 0;
+                this.lostCountEl.textContent = 0;
+                
+                this.gameRunning = true;
+                this.gameOverEl.style.display = 'none';
+                this.victoryEl.style.display = 'none';
+                document.body.style.opacity = '1';
+                document.body.style.transition = '';
+
+                document.querySelectorAll('.sweet, .firework').forEach(el => el.remove());
+                this.fallingSweets = [];
+
+                this.dropSweets();
+            }
+
+            createFireworks() {
+                for (let i = 0; i < 60; i++) {
+                    setTimeout(() => {
+                        this.createFirework();
+                    }, i * 80);
+                }
+            }
+
+            createFirework() {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = Math.random() * window.innerWidth + 'px';
+                firework.style.top = Math.random() * window.innerHeight + 'px';
+                
+                const colors = ['#ff1493', '#ffffff', '#ffd93d', '#ff6b6b', '#ff9ff3'];
+                firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(firework);
+
+                const dx = (Math.random() - 0.5) * 1200;
+                const dy = (Math.random() - 0.5) * 1200;
+                
+                let progress = 0;
+                const explode = () => {
+                    progress += 0.04;
+                    firework.style.transform = `translate(${dx * progress}px, ${dy * progress}px) scale(${1 - progress * 2})`;
+                    firework.style.opacity = 1 - progress;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(explode);
+                    } else {
+                        firework.remove();
+                    }
+                };
+                explode();
+            }
+        }
+
+        // Start the game
+        new SweetGame();
+    </script>
+</body>
+</html>
